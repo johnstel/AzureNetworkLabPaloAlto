@@ -587,7 +587,7 @@
             "name": "VM-FW1",
             "location": "[resourceGroup().location]",
             "plan": {
-                "name": "bundle2",
+                "name": "[parameters('paloSKU')]",
                 "product": "vmseries1",
                 "publisher": "paloaltonetworks"
             },
@@ -658,7 +658,7 @@
             "name": "VM-FW2",
             "location": "[resourceGroup().location]",
             "plan": {
-                "name": "bundle2",
+                "name": "[parameters('paloSKU')]",
                 "product": "vmseries1",
                 "publisher": "paloaltonetworks"
             },
