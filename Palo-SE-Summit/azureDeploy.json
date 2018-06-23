@@ -255,7 +255,10 @@
         {
             "type": "Microsoft.Network/loadBalancers",
             "name": "LB-Egress",
-            "apiVersion": "2016-03-30",
+            "apiVersion": "2017-08-01",
+            "sku":{
+                "name": "Standard"
+            },
             "location": "[resourceGroup().location]",
             "properties": {
                 "frontendIPConfigurations": [
@@ -277,44 +280,11 @@
                 ],
                 "loadBalancingRules": [
                     {
-                        "name": "LB-Egress-HTTP",
-                        "properties": {
-                            "frontendIPConfiguration": {
-                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'LB-Egress'), '/frontendIPConfigurations/LB-Egress-FrontEnd')]"
-                            },
-                            "frontendPort": 80,
-                            "backendPort": 80,
-                            "enableFloatingIP": true,
-                            "idleTimeoutInMinutes": 4,
-                            "protocol": "Tcp",
-                            "loadDistribution": "sourceIP",
-                            "backendAddressPool": {
-                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'LB-Egress'), '/backendAddressPools/AS-FW')]"
-                            },
-                            "probe": {
-                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'LB-Egress'), '/probes/TCP-22')]"
-                            }
-                        }
-                    },
-                    {
-                        "name": "LB-Egress-SSL",
-                        "properties": {
-                            "frontendIPConfiguration": {
-                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'LB-Egress'), '/frontendIPConfigurations/LB-Egress-FrontEnd')]"
-                            },
-                            "frontendPort": 443,
-                            "backendPort": 443,
-                            "enableFloatingIP": true,
-                            "idleTimeoutInMinutes": 4,
-                            "protocol": "Tcp",
-                            "loadDistribution": "sourceIP",
-                            "backendAddressPool": {
-                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'LB-Egress'), '/backendAddressPools/AS-FW')]"
-                            },
-                            "probe": {
-                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'LB-Egress'), '/probes/TCP-22')]"
-                            }
-                        }
+                       "properties":{
+                           "protocol": "All",
+                           "frontendPort": "0",
+                           "backendPort": "0"
+                       }
                     }
                 ],
                 "probes": [
