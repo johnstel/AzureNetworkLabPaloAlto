@@ -255,10 +255,7 @@
         {
             "type": "Microsoft.Network/loadBalancers",
             "name": "LB-Egress",
-            "apiVersion": "2017-08-01",
-            "sku":{
-                "name": "Standard"
-            },
+            "apiVersion": "2016-03-30",
             "location": "[resourceGroup().location]",
             "properties": {
                 "frontendIPConfigurations": [
@@ -280,11 +277,44 @@
                 ],
                 "loadBalancingRules": [
                     {
-                       "properties":{
-                           "protocol": "All",
-                           "frontendPort": "0",
-                           "backendPort": "0"
-                       }
+                        "name": "LB-Egress-HTTP",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'LB-Egress'), '/frontendIPConfigurations/LB-Egress-FrontEnd')]"
+                            },
+                            "frontendPort": 80,
+                            "backendPort": 80,
+                            "enableFloatingIP": true,
+                            "idleTimeoutInMinutes": 4,
+                            "protocol": "Tcp",
+                            "loadDistribution": "sourceIP",
+                            "backendAddressPool": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'LB-Egress'), '/backendAddressPools/AS-FW')]"
+                            },
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'LB-Egress'), '/probes/TCP-22')]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "LB-Egress-SSL",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'LB-Egress'), '/frontendIPConfigurations/LB-Egress-FrontEnd')]"
+                            },
+                            "frontendPort": 443,
+                            "backendPort": 443,
+                            "enableFloatingIP": true,
+                            "idleTimeoutInMinutes": 4,
+                            "protocol": "Tcp",
+                            "loadDistribution": "sourceIP",
+                            "backendAddressPool": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'LB-Egress'), '/backendAddressPools/AS-FW')]"
+                            },
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'LB-Egress'), '/probes/TCP-22')]"
+                            }
+                        }
                     }
                 ],
                 "probes": [
@@ -308,6 +338,7 @@
                 "[resourceId('Microsoft.Compute/availabilitySets', 'AS-FW')]"
             ]
         },
+
         {
             "apiVersion": "2015-06-15",
             "type": "Microsoft.Network/networkInterfaces",
@@ -415,8 +446,7 @@
             "name": "INT-FW1-Trust",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]",
-                "[resourceId('Microsoft.Network/loadBalancers', 'LB-Egress')]"
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]"
 
             ],
             "properties": {
@@ -429,12 +459,7 @@
                             "subnet": {
                                 "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName')), '/subnets/Trust')]"
                             },
-                            "privateIpAddress": "10.0.2.5",
-                            "loadBalancerBackendAddressPools": [
-                                {
-                                    "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'LB-Egress'), '/backendAddressPools/AS-FW')]"
-                                }
-                            ]
+                            "privateIpAddress": "10.0.2.5"
                         }
                     }
                 ]
@@ -446,8 +471,7 @@
             "name": "INT-FW2-Trust",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]",
-                "[resourceId('Microsoft.Network/loadBalancers', 'LB-Egress')]"
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]"
             ],
             "properties": {
                 "enableIPForwarding": true,
@@ -459,12 +483,7 @@
                             "subnet": {
                                 "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName')), '/subnets/Trust')]"
                             },
-                            "privateIpAddress": "10.0.2.6",
-                            "loadBalancerBackendAddressPools": [
-                                {
-                                    "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'LB-Egress'), '/backendAddressPools/AS-FW')]"
-                                }
-                            ]
+                            "privateIpAddress": "10.0.2.6"
                         }
                     }
                 ]
@@ -578,7 +597,7 @@
                         "publisher": "paloaltonetworks",
                         "offer": "vmseries1",
                         "sku": "[parameters('paloSKU')]",
-                        "version": "latest"
+                        "version": "8.0.0"
                     },
                     "osDisk": {
                         "name": "osdisk",
@@ -649,7 +668,7 @@
                         "publisher": "paloaltonetworks",
                         "offer": "vmseries1",
                         "sku": "[parameters('paloSKU')]",
-                        "version": "latest"
+                        "version": "8.0.0"
                     },
                     "osDisk": {
                         "name": "osdisk",
